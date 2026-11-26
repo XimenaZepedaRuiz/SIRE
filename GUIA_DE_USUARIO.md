@@ -11,7 +11,7 @@ https://sire-web-production.up.railway.app
 ### Credenciales de acceso para evaluación
 
 - Correo electrónico: enfermera@sire.test
-- Contraseña: Se proporcionara de manera privada a el docente.
+- Contraseña: enfermera1
 
 ## 2. Inicio de sesión
 
