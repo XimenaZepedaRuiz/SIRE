@@ -1,0 +1,26 @@
+
+# Entorno virtual
+.venv/
+venv/
+
+# Variables de entorno y contraseñas
+.env
+.env.*
+!.env.example
+
+# Archivos temporales de Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Configuracion del editor
+.vscode/
+
+# Archivos temporales y respaldos
+*.log
+*.zip
+*.bak
+*.key
+*.pem
+*.sql
+!base_de_datos.sql

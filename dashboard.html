@@ -1,0 +1,641 @@
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>SIRE | Panel de enfermería</title>
+
+    <link rel="icon"
+          href="{{ url_for('static', filename='img/cuidatec.png') }}">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+          rel="stylesheet">
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/estilos.css') }}">
+
+</head>
+
+<body>
+
+    <!-- ENCABEZADO INSTITUCIONAL -->
+
+    <header class="encabezado-institucional">
+
+        <div class="logos-institucionales">
+
+            <img src="{{ url_for('static', filename='img/tecnm.png') }}"
+                 class="logo-tecnm"
+                 alt="Tecnológico Nacional de México">
+
+            <img src="{{ url_for('static', filename='img/itmh.png') }}"
+                 class="logo-itmh"
+                 alt="Instituto Tecnológico de Matehuala">
+
+        </div>
+
+        <div class="nombre-institucion">
+
+            <h2>Tecnológico Nacional de México</h2>
+
+            <p>Campus Matehuala</p>
+
+        </div>
+
+    </header>
+
+
+    <!-- BARRA PRINCIPAL DE SIRE -->
+
+    <div class="barra-sire">
+
+        <div class="marca-sire">
+
+            <i class="bi bi-heart-pulse"></i>
+
+            <div>
+                <h1>SIRE</h1>
+
+                <p>
+                    Sistema Inteligente de Registro de Enfermería
+                </p>
+            </div>
+
+        </div>
+
+        <div class="usuario-sire">
+
+            <i class="bi bi-person-circle"></i>
+
+            <div>
+                <span>{{ current_user.nombre }}</span>
+
+                <small class="d-block text-white-50">
+                    Personal de enfermería
+                </small>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- DISTRIBUCIÓN PRINCIPAL -->
+
+    <div class="panel-layout">
+
+
+        <!-- MENÚ LATERAL -->
+
+        <aside class="menu-lateral">
+
+            <div class="text-center mb-4">
+
+                <img src="{{ url_for('static', filename='img/cuidatec.png') }}"
+                     class="logo-cuidatec"
+                     alt="CuidaTec">
+
+                <p class="mt-3 mb-0 fw-semibold">
+                    CuidaTec
+                </p>
+
+                <small class="text-white-50">
+                    Cuida tu salud
+                </small>
+
+            </div>
+
+            <hr>
+
+            <div class="menu-titulo">
+                MENÚ PRINCIPAL
+            </div>
+
+            <a href="{{ url_for('dashboard') }}"
+               class="menu-enlace activo">
+
+                <i class="bi bi-grid-1x2"></i>
+
+                Inicio
+
+            </a>
+
+            <a href="{{ url_for('historial') }}"
+               class="menu-enlace">
+
+                <i class="bi bi-clock-history"></i>
+
+                Historial
+
+            </a>
+
+            <a href="{{ url_for('historial') }}#reportes"
+               class="menu-enlace">
+
+                <i class="bi bi-file-earmark-text"></i>
+
+                Reportes mensuales
+
+            </a>
+
+            <hr>
+
+            <form method="POST"
+                  action="{{ url_for('salir') }}">
+
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <button type="submit"
+                        class="menu-enlace btn-salir">
+
+                    <i class="bi bi-box-arrow-left"></i>
+
+                    Cerrar sesión
+
+                </button>
+
+            </form>
+
+        </aside>
+
+
+        <!-- CONTENIDO PRINCIPAL -->
+
+        <main class="panel-contenido">
+
+            <!-- BIENVENIDA -->
+
+            <h2 class="panel-titulo">
+                Panel de enfermería
+            </h2>
+
+            <p class="panel-subtitulo">
+                Bienvenida, {{ current_user.nombre }}.
+                Gestiona las atenciones del módulo CuidaTec
+                de manera sencilla y organizada.
+            </p>
+
+
+            <!-- MENSAJES DEL SISTEMA -->
+
+            {% with mensajes = get_flashed_messages(
+                with_categories=true
+            ) %}
+
+                {% for categoria, mensaje in mensajes %}
+
+                    <div class="alert alert-{{ categoria }}"
+                         role="alert">
+
+                        {{ mensaje }}
+
+                    </div>
+
+                {% endfor %}
+
+            {% endwith %}
+
+
+            <!-- BUSCADOR POR NÚMERO DE CONTROL -->
+
+            <section class="tarjeta-panel">
+
+                <div class="tarjeta-encabezado">
+
+                    <div class="icono-panel">
+                        <i class="bi bi-clipboard2-plus"></i>
+                    </div>
+
+                    <div>
+
+                        <h3 class="mb-1">
+                            Nueva atención
+                        </h3>
+
+                        <p class="text-muted mb-0">
+                            Identifica al estudiante para
+                            registrar su atención de enfermería.
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <form method="POST"
+                      action="{{ url_for('dashboard') }}">
+
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <label for="numero_control"
+                           class="form-label">
+
+                        Número de control
+
+                    </label>
+
+                    <div class="row g-3 align-items-center">
+
+                        <div class="col-md-9">
+
+                            <div class="input-group">
+
+                                <span class="input-group-text">
+                                    <i class="bi bi-person-vcard"></i>
+                                </span>
+
+                                <input type="text"
+                                       id="numero_control"
+                                       name="numero_control"
+                                       class="form-control"
+                                       placeholder="Ejemplo: 26000001"
+                                       maxlength="20"
+                                       value="{{ estudiante.numero_control if estudiante else '' }}"
+                                       required>
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-3">
+
+                            <button type="submit"
+                                    class="btn btn-institucional w-100">
+
+                                <i class="bi bi-search"></i>
+
+                                Buscar
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </form>
+
+            </section>
+
+
+            <!-- INFORMACIÓN DEL ESTUDIANTE ENCONTRADO -->
+
+            {% if estudiante %}
+
+            <section class="tarjeta-panel">
+
+                <div class="tarjeta-encabezado">
+
+                    <div class="icono-panel">
+                        <i class="bi bi-person-check"></i>
+                    </div>
+
+                    <div>
+
+                        <h3 class="mb-1">
+                            Información del estudiante
+                        </h3>
+
+                        <p class="text-muted mb-0">
+                            Datos obtenidos del registro institucional.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="datos-estudiante">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+
+                            <div class="dato-etiqueta">
+                                Número de control
+                            </div>
+
+                            <div class="dato-valor">
+                                {{ estudiante.numero_control }}
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <div class="dato-etiqueta">
+                                Nombre completo
+                            </div>
+
+                            <div class="dato-valor">
+                                {{ estudiante.nombre_completo }}
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <div class="dato-etiqueta">
+                                Carrera
+                            </div>
+
+                            <div class="dato-valor">
+                                {{ estudiante.carrera }}
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-3">
+
+                            <div class="dato-etiqueta">
+                                Sexo
+                            </div>
+
+                            <div class="dato-valor">
+                                {{ estudiante.sexo }}
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-3">
+
+                            <div class="dato-etiqueta">
+                                Edad
+                            </div>
+
+                            <div class="dato-valor">
+                                {{ estudiante.edad }} años
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- FORMULARIO DE ATENCIÓN -->
+
+                <div class="tarjeta-encabezado mt-4">
+
+                    <div class="icono-panel">
+                        <i class="bi bi-heart-pulse"></i>
+                    </div>
+
+                    <div>
+
+                        <h3 class="mb-1">
+                            Registrar atención
+                        </h3>
+
+                        <p class="text-muted mb-0">
+                            Completa la información de la
+                            atención proporcionada.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <form method="POST"
+                      action="{{ url_for('registrar_atencion') }}"
+                      class="formulario-atencion">
+
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <input type="hidden"
+                           name="numero_control"
+                           value="{{ estudiante.numero_control }}">
+
+
+                    <div class="row g-4">
+
+                        <!-- MOTIVO DE VISITA -->
+
+                        <div class="col-md-6">
+
+                            <label for="motivo_visita"
+                                   class="form-label">
+
+                                <i class="bi bi-clipboard2"></i>
+
+                                Motivo de la visita
+
+                                <span class="text-danger">*</span>
+
+                            </label>
+
+                            <textarea class="form-control"
+                                      id="motivo_visita"
+                                      name="motivo_visita"
+                                      rows="4"
+                                      placeholder="Describe por qué acudió el estudiante"
+                                      required></textarea>
+
+                        </div>
+
+
+                        <!-- SIGNOS VITALES -->
+
+                        <div class="col-md-6">
+
+                            <label for="signos_vitales"
+                                   class="form-label">
+
+                                <i class="bi bi-activity"></i>
+
+                                Signos vitales
+
+                            </label>
+
+                            <textarea class="form-control"
+                                      id="signos_vitales"
+                                      name="signos_vitales"
+                                      rows="4"
+                                      placeholder="Temperatura, frecuencia cardiaca, presión arterial..."></textarea>
+
+                        </div>
+
+
+                        <!-- PROCEDIMIENTO -->
+
+                        <div class="col-md-6">
+
+                            <label for="procedimiento"
+                                   class="form-label">
+
+                                <i class="bi bi-bandaid"></i>
+
+                                Procedimiento realizado
+
+                                <span class="text-danger">*</span>
+
+                            </label>
+
+                            <textarea class="form-control"
+                                      id="procedimiento"
+                                      name="procedimiento"
+                                      rows="4"
+                                      placeholder="Describe la atención proporcionada"
+                                      required></textarea>
+
+                        </div>
+
+
+                        <!-- OBSERVACIONES -->
+
+                        <div class="col-md-6">
+
+                            <label for="observaciones"
+                                   class="form-label">
+
+                                <i class="bi bi-journal-text"></i>
+
+                                Observaciones adicionales
+
+                            </label>
+
+                            <textarea class="form-control"
+                                      id="observaciones"
+                                      name="observaciones"
+                                      rows="4"
+                                      placeholder="Información adicional sobre la atención"></textarea>
+
+                        </div>
+
+                    </div>
+
+
+                    <p class="text-muted small mt-3">
+
+                        <span class="text-danger">*</span>
+
+                        Campos obligatorios.
+
+                    </p>
+
+
+                    <div class="d-flex flex-wrap gap-3 mt-4">
+
+                        <button type="submit"
+                                class="btn btn-registrar">
+
+                            <i class="bi bi-check-circle"></i>
+
+                            Guardar atención
+
+                        </button>
+
+                        <a href="{{ url_for('dashboard') }}"
+                           class="btn btn-outline-secondary">
+
+                            <i class="bi bi-x-circle"></i>
+
+                            Cancelar
+
+                        </a>
+
+                    </div>
+
+                </form>
+
+            </section>
+
+            {% endif %}
+
+
+            <!-- ACCESOS RÁPIDOS -->
+
+            <h3 class="fs-5 fw-bold mb-3"
+                style="color: #1b396a;">
+
+                Accesos rápidos
+
+            </h3>
+
+            <div class="row g-3">
+
+                <div class="col-md-6">
+
+                    <a href="{{ url_for('historial') }}"
+                       class="acceso-rapido">
+
+                        <i class="bi bi-clock-history"></i>
+
+                        <h4>Historial de atenciones</h4>
+
+                        <p>
+                            Consulta las atenciones de enfermería
+                            registradas en el sistema.
+                        </p>
+
+                    </a>
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <a href="{{ url_for('historial') }}#reportes"
+                       class="acceso-rapido">
+
+                        <i class="bi bi-file-earmark-word"></i>
+
+                        <h4>Reportes mensuales</h4>
+
+                        <p>
+                            Genera y descarga la bitácora mensual
+                            de CuidaTec en formato Word.
+                        </p>
+
+                    </a>
+
+                </div>
+
+            </div>
+
+
+            <!-- AVISO DE PRIVACIDAD -->
+
+            <div class="aviso-acceso">
+
+                <i class="bi bi-shield-lock"></i>
+
+                La información registrada en SIRE es de
+                carácter confidencial y su consulta está
+                reservada al personal autorizado.
+
+            </div>
+
+
+            <!-- PIE DE PÁGINA -->
+
+            <footer class="pie-pagina">
+
+                <p class="mb-1">
+                    SIRE © 2026 |
+                    Sistema Inteligente de Registro de Enfermería
+                </p>
+
+                <p class="mb-1">
+                    Tecnológico Nacional de México · Campus Matehuala
+                </p>
+
+                <p>
+                    By: Nexora Solutions
+                </p>
+            </footer>
+
+        </main>
+
+    </div>
+
+</body>
+
+</html>
